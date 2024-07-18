@@ -1,0 +1,560 @@
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+	
+    <style>
+        * {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        body {
+            background-color: black;
+
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #ccc;
+        }
+		
+		 #soundButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+			background-color: rgb(110, 109, 109,0.5);
+        }
+		#soundButton:hover{
+			background-color: rgb(110, 109, 109,0.8);
+		}
+		
+		
+		
+		#helpText{
+			position:absolute;
+			top:10%;
+			bottom:10%;
+			left:10%;
+			right:10%;
+			color:black;
+			font-size:14px;
+            line-height: 20px;
+		}
+		
+    </style>
+</head>
+<body>
+
+
+<div style="display: inline-block;
+            position: relative;">
+	
+    <div id='overlappingDiv' style="background-color:white;
+                                    position: absolute;
+                                    top:0;
+                                    right:0;
+                                    bottom:0;
+                                    left:0;
+                                    opacity: 0;
+                                    pointer-events: none;
+                                    z-index: 10">
+    </div>
+	
+	
+    <canvas>
+    </canvas>
+    <div
+    id="npcDialogueBox"
+    style="
+      background-color: white;
+      height: 140px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-top: 4px black solid;
+      display: none;
+      padding: 12px;
+      z-index: 10;
+    "
+  ></div>
+
+	<button id="soundButton" onclick="toggleSound()">
+            <span id="soundIcon">🔊</span> <!-- Unicode speaker icon -->
+        </button>
+	<div id="menuUI" style="display:flex;
+							position:absolute;
+							top:0;
+							bottom:0;
+							left:0;
+							right:0;
+                            background-image: url('./img/StartMap.png');">
+		
+		<div id="playButton"  style="display:flex;
+					position:absolute;
+					top:45%;
+					bottom:45%;
+					left:37.5%;
+					right:37.5%;
+					background-color:yellow;
+					justify-content:center;
+					border:4px black solid;">
+					<button style="font-size:28px;
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;">Graj</button>
+					
+		</div>
+		
+		<div id="helpButton"  style="display:flex;
+					position:absolute;
+					top:60%;
+					bottom:30%;
+					left:40%;
+					right:40%;
+					background-color:yellow;
+					justify-content:center;
+					border:4px black solid;">
+					<button style="font-size:28px;
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;">Pomoc</button>
+					
+		</div>
+		
+		<div id='helpDiv' style='display:none;
+								position:absolute;
+								top:10%;
+								bottom:10%;
+								left:20%;
+								right:20%;
+								background-color:rgba(255, 255, 255, 0.8);'>
+								
+			<p id='helpText'>W - w górę <br>S - w dół<br>A - w lewo <br>D - w prawo<br> ESC - powrót<br> C - informacje o postaci<br> I - ekwipunek <br>Spacja - interakcja  <br>Lewy przycisk myszy - wybór opcji (np podczas walki lub podczas rozmowy z NPC) </p>
+		
+		</div>
+		<!-- <button id='exitHelp'><span>⨯</span></button> #exitHelp{
+			display:none;
+			position:absolute;
+			top:11%;
+			right:21%;
+			background-color: rgba(255, 255, 255, 0)';
+			z-index:10;
+		}
+		
+		#exitHelp:hover{
+			background-color: rgba(255, 255, 255, 0.8);
+		}-->
+		
+		
+	</div>
+    <!-- Class choose interface -->
+    <div id="classChoice" style="display:none;
+                grid-template-columns: repeat(2,1fr);
+                position:absolute;
+                top:0;
+                bottom:0;
+                left:0;
+                right:0;
+                background-color: aqua;">
+                <button id="classOne" style="background-image: url(./img/Faceset.png);
+                
+                                background-size: cover;
+                                display: flex; 
+                                flex-direction: column; 
+                                align-items: center; 
+                                justify-content: flex-end;
+                                
+                                ">
+                                    <span style="
+                                    display: flex;
+                                    padding-top: 5px;
+                                    justify-content: center; 
+                                    position:absolute;
+                                    background-color: white;
+                                    left:0;
+                                    right:50%;
+                                    bottom:0;
+                                    top:95%;
+                                    ">Mag</span>
+                                </button>
+                <button id="classTwo" style="background-image: url(./img/ninjaFace.png);
+                                display: flex; 
+                                background-size: cover;
+                                flex-direction: column; 
+                                align-items: center; 
+                                justify-content: flex-end;"> 
+                                    <span style="
+                                    display: flex;
+                                    padding-top: 5px;
+                                    justify-content: center; 
+                                    position:absolute;
+                                    background-color: white;
+                                    left:50%;
+                                    right:0;
+                                    bottom:0;
+                                    top:95%;
+                                    "> Ninja</span>
+                                </button>
+
+
+    </div>
+	
+	<div id="playerUI" style="display:none;">
+        
+        <div id="inventoryUI" style="display:none;
+        position:absolute;
+        top:0;
+        bottom:60px;
+        left:0;
+        right:0;
+        flex-direction: row;
+        background-color: #707070;">
+            <div id="characterImg" style="background-image: none;position:absolute;
+            top:0;
+            bottom:50%;
+            left:0;
+            right:75%;
+            background-size: cover;"><span>            </span></div>
+            <div style="position:absolute; top:50%;
+            left:0;
+            right:75%;
+            display:flex;
+                flex-direction: row;
+                justify-content: space-evenly;
+                height:77px;
+                background-image: url('./img/equipped.png');
+                padding:0;
+                margin: 0;">
+                <div id='itemsDropZone1'style="position:absolute; right:50%;
+                top:0;
+                bottom:0;
+                left:0;
+                display:flex;
+                    flex-direction: row;
+                    justify-content: space-evenly;
+                    height:77px;
+                    padding-top:5px;
+                margin: 0;
+                z-index: 11;">
+
+                </div>
+
+                <div id='itemsDropZone2' style="position:absolute; 
+                right:0;
+                left:50%;
+                top:0;
+                bottom:0;
+                display:flex;
+                    flex-direction: row;
+                    justify-content: space-evenly;
+                    height:77px;
+                    padding-top:5px;
+                margin: 0;
+                z-index: 11;">
+
+                </div>
+            </div>
+            <div id="characterInfo" style="
+            display: grid;
+            grid-template-columns: 43px 170px 43px;
+            grid-template-rows: repeat(2, 90px);
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+            position: absolute;
+            top:65%;
+            bottom:0;
+            left:0;
+            right:75%;
+            background-image: url('./img/stats.png');">
+                <span id='attackValue'style="margin:auto;font-size: 12px;">1</span>
+                <span style="margin:auto;font-size: 12px;"> Atak</span>
+                <button id='atkButton' style="margin:auto;font-size: 12px; background: none; border: none;" onclick="addAtk()"> </button>
+                <span id='defValue' style="margin:auto;font-size: 12px;">1</span>
+                <span style="margin:auto;font-size: 12px;"> Obrona</span>
+                <button id='defButton' style="margin:auto;font-size: 12px; background: none; border: none; " onclick="addDef()"> </button>
+        </div>
+                <div id="characterInv" style="background-image: url(./img/Inventory.png);position:absolute;
+                top:0;
+                bottom:0;
+                left:25%;
+                right:0;
+                display:grid;
+                grid-template-columns: repeat(12,1fr);">
+                
+                    <div id='item' style="height: 58px;
+                                width: 59px;
+                                background-image: url('./img/Sword.png');
+                                background-size: cover;
+                                border: 1px solid #ccc;
+                                border-radius: 16px;
+                                justify-content: center;
+                                display:flex;
+                                flex-direction: column;
+                                align-items: center;
+                                margin-top:3px;
+                                margin-left:2px;
+                                z-index: 10;"
+                                draggable="true"> <h3></h3>
+                    </div>
+
+                    <div id='item2' style="height: 58px;
+                    width: 59px;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;
+                    background-image: url('./img/Armor.png');"
+                                draggable="true"> <h3></h3>
+                    </div>
+
+                    <div id='item3' style="height: 58px;
+                    background-image: url('./img/Axe.png');
+                                background-size: cover;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>3</h3>
+                    </div>
+
+                    <div id='item4' style="height: 58px;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>4</h3>
+                    </div>
+
+                    <div id='item5' style="height: 58px;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>5</h3>
+                    </div>
+
+                    <div id='item6' style="height: 58px;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>6</h3>
+                    </div>
+
+                    <div id='item7' style="height: 58px;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>7</h3>
+                    </div>
+
+                    <div id='item8' style="height: 58px;
+                    width: 59px;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border-radius: 16px;
+                    justify-content: center;
+                    display:none;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-top:3px;
+                    margin-left:2px;
+                    z-index: 10;"
+                                draggable="true"> <h3>8</h3>
+                    </div>
+                
+
+                </div>
+
+
+</div>
+		<div style="position:absolute;
+								right:120px;
+								left:120px;
+								bottom:0;
+								height:12px;
+								background-color: #ccc;
+								border:2px black solid;
+								">
+		</div>
+		<!-- XP bar, 120px from left and 120 px from right, 1024-240=784 px wide xp bar add to right to make the xp amount lower, substract from right to make it bigger)-->
+		<div id='xpBar' style="background-color: #702963;
+                                height: 12px;
+                                position: absolute;
+                                right:904px;
+                                left:120px;
+                                bottom:0;
+                                border:2px black solid;
+        ">
+        </div>
+		   <div id="level" style="display: flex;
+        align-items: center; 
+        justify-content: center; 
+        height: 36px;
+        position: absolute;
+        right:36px;
+        bottom:12px;
+        background-color: rgba(220, 220, 220, 0.5); 
+        padding: 0;
+        margin: 0;
+        ">
+    <span id="levelValue" style="margin: 5px;padding: 0;">1</span>
+    
+</div>
+
+
+	
+	</div>
+    <div id="userInterface" style="display:none">
+    <!-- HP OF enemy-->
+    <div  style="background-color:white;
+                width: 250px;
+                position: absolute;
+                top:50px;
+                left:50px;
+                border: 4px black solid;
+                padding: 12px;">
+        <h1 id='enemyHP' style="font-size: 16px;
+    "> Placeholder</h1>
+        <div style="position:relative">
+            <div style="background-color: #ccc;
+                        height: 5px;
+                        margin-top:8px"></div>
+            <div id='enemyHealthBar' style="background-color: green;
+        height: 5px;
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;"></div>
+        </div>
+    </div>
+    <!-- HP OF player-->
+    <div style="background-color:white;
+width: 250px;
+position: absolute;
+top:330px;
+right:50px;
+border: 4px black solid;
+padding: 12px;">
+        <h1 style="font-size: 16px;
+    "> Gracz</h1>
+        <div style="position:relative">
+            <div style="background-color: #ccc;
+        height: 5px;
+        margin-top:8px"></div>
+            <div id='playerHealthBar' style="background-color: green;
+        height: 5px;
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;"></div>
+        </div>
+    </div>
+
+    <div style="background-color:white; 
+                height: 140px; 
+                position: absolute; 
+                bottom:0; 
+                left:0; 
+                right:0; 
+                border-top:4px black solid; 
+                display:flex;">
+        <!-- dialogue box-->
+        <div id="dialogueBox" style="position:absolute;
+                            top:0;
+                            right:0;
+                            bottom:0;
+                            left:0;
+                            background-color: white;
+                            padding: 12px;
+                            display: none;
+                            cursor: pointer;
+                            "></div>
+
+        <div id="attacksBox" style="width: 66.6%;
+                    display:grid;
+                    grid-template-columns: repeat(2,1fr);">
+
+        </div>
+        <div id='attackType' style="width: 33.33%;
+                    display:flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-left: 4px black solid;">
+            <h1 style="font-size: 16px;">Attack Type</h1>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"
+    integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="data/audio.js"></script>
+<script src="data/transitionzone.js"></script>
+<script src="data/npcCollisions.js"></script>
+<script src="inventory.js"></script>
+<script src="data/battlezones.js"></script>
+<script src="data/collisions.js"></script>
+<script src="data/attacks.js"></script>
+<script src="data/monsters.js"></script>
+<script src="classes.js"></script>
+<script src="battle.js"></script>
+<script src="index.js"></script>
